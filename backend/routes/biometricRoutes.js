@@ -1,167 +1,369 @@
-// // // // // routes/biometricRoutes.js - COMPLETE WORKING CODE
+// // // // // // routes/biometricRoutes.js - COMPLETE WORKING CODE
+// // // // // import express from 'express'
+// // // // // import User from '../models/User.js'
+// // // // // import auth from '../middleware/auth.js'
+
+// // // // // const router = express.Router()
+
+// // // // // // GET /api/biometric/status
+// // // // // router.get('/status', auth, async (req, res) => {
+// // // // //   try {
+// // // // //     const user = await User.findById(req.user.userId)
+// // // // //     if (!user) return res.status(404).json({ message: 'User not found' })
+
+// // // // //     res.json({
+// // // // //       faceRegistered: user.faceRegistered || false,
+// // // // //       fingerprintRegistered: user.fingerprintRegistered || false
+// // // // //     })
+// // // // //   } catch (err) {
+// // // // //     console.error('Status error:', err)
+// // // // //     res.status(500).json({ message: 'Server error' })
+// // // // //   }
+// // // // // })
+
+// // // // // // POST /api/biometric/register-face
+// // // // // router.post('/register-face', auth, async (req, res) => {
+// // // // //   try {
+// // // // //     console.log('Register face request body:', req.body) // ADD THIS FOR DEBUGGING
+    
+// // // // //     const { faceData } = req.body
+// // // // //     const userId = req.user.userId
+
+// // // // //     if (!faceData || faceData.trim() === '') {
+// // // // //       console.log('Missing faceData')
+// // // // //       return res.status(400).json({ message: 'Face data is required' })
+// // // // //     }
+
+// // // // //     const user = await User.findById(userId)
+// // // // //     if (!user) {
+// // // // //       console.log('User not found:', userId)
+// // // // //       return res.status(404).json({ message: 'User not found' })
+// // // // //     }
+
+// // // // //     // Save face data
+// // // // //     user.faceData = faceData
+// // // // //     user.faceRegistered = true
+// // // // //     await user.save()
+
+// // // // //     console.log('Face registered for user:', userId)
+    
+// // // // //     res.json({ 
+// // // // //       success: true, 
+// // // // //       message: 'Face registered successfully' 
+// // // // //     })
+// // // // //   } catch (err) {
+// // // // //     console.error('Register face error:', err)
+// // // // //     res.status(500).json({ message: 'Server error: ' + err.message })
+// // // // //   }
+// // // // // })
+
+// // // // // // POST /api/biometric/register-fingerprint
+// // // // // router.post('/register-fingerprint', auth, async (req, res) => {
+// // // // //   try {
+// // // // //     console.log('Register fingerprint request body:', req.body)
+    
+// // // // //     const { fingerprintData } = req.body
+// // // // //     const userId = req.user.userId
+
+// // // // //     if (!fingerprintData || fingerprintData.trim() === '') {
+// // // // //       return res.status(400).json({ message: 'Fingerprint data is required' })
+// // // // //     }
+
+// // // // //     const user = await User.findById(userId)
+// // // // //     if (!user) return res.status(404).json({ message: 'User not found' })
+
+// // // // //     user.fingerprintData = fingerprintData
+// // // // //     user.fingerprintRegistered = true
+// // // // //     await user.save()
+
+// // // // //     res.json({ 
+// // // // //       success: true, 
+// // // // //       message: 'Fingerprint registered successfully' 
+// // // // //     })
+// // // // //   } catch (err) {
+// // // // //     console.error('Register fingerprint error:', err)
+// // // // //     res.status(500).json({ message: 'Server error' })
+// // // // //   }
+// // // // // })
+
+// // // // // export default router
+
+
+
+
+// // // // // routes/biometricRoutes.js - ADD THIS ROUTE
 // // // // import express from 'express'
 // // // // import User from '../models/User.js'
 // // // // import auth from '../middleware/auth.js'
 
 // // // // const router = express.Router()
 
-// // // // // GET /api/biometric/status
-// // // // router.get('/status', auth, async (req, res) => {
-// // // //   try {
-// // // //     const user = await User.findById(req.user.userId)
-// // // //     if (!user) return res.status(404).json({ message: 'User not found' })
+// // // // // ... your existing routes ...
 
-// // // //     res.json({
-// // // //       faceRegistered: user.faceRegistered || false,
-// // // //       fingerprintRegistered: user.fingerprintRegistered || false
-// // // //     })
-// // // //   } catch (err) {
-// // // //     console.error('Status error:', err)
-// // // //     res.status(500).json({ message: 'Server error' })
-// // // //   }
-// // // // })
-
-// // // // // POST /api/biometric/register-face
-// // // // router.post('/register-face', auth, async (req, res) => {
+// // // // // ADD THIS NEW ENDPOINT FOR FACE VERIFICATION
+// // // // router.post('/verify-face', auth, async (req, res) => {
 // // // //   try {
-// // // //     console.log('Register face request body:', req.body) // ADD THIS FOR DEBUGGING
+// // // //     console.log('POST /verify-face - User ID:', req.user.userId);
     
-// // // //     const { faceData } = req.body
-// // // //     const userId = req.user.userId
-
+// // // //     const { faceData } = req.body;
+    
 // // // //     if (!faceData || faceData.trim() === '') {
-// // // //       console.log('Missing faceData')
-// // // //       return res.status(400).json({ message: 'Face data is required' })
+// // // //       return res.status(400).json({ 
+// // // //         success: false,
+// // // //         message: 'Face data is required for verification' 
+// // // //       });
 // // // //     }
 
-// // // //     const user = await User.findById(userId)
+// // // //     const user = await User.findById(req.user.userId);
 // // // //     if (!user) {
-// // // //       console.log('User not found:', userId)
-// // // //       return res.status(404).json({ message: 'User not found' })
+// // // //       return res.status(404).json({ 
+// // // //         success: false,
+// // // //         message: 'User not found' 
+// // // //       });
 // // // //     }
 
-// // // //     // Save face data
-// // // //     user.faceData = faceData
-// // // //     user.faceRegistered = true
-// // // //     await user.save()
-
-// // // //     console.log('Face registered for user:', userId)
+// // // //     // SIMPLE STRING COMPARISON
+// // // //     // This is for demo - in real app use facial recognition
+// // // //     const isMatch = user.faceData && user.faceData === faceData;
     
-// // // //     res.json({ 
-// // // //       success: true, 
-// // // //       message: 'Face registered successfully' 
-// // // //     })
-// // // //   } catch (err) {
-// // // //     console.error('Register face error:', err)
-// // // //     res.status(500).json({ message: 'Server error: ' + err.message })
-// // // //   }
-// // // // })
-
-// // // // // POST /api/biometric/register-fingerprint
-// // // // router.post('/register-fingerprint', auth, async (req, res) => {
-// // // //   try {
-// // // //     console.log('Register fingerprint request body:', req.body)
+// // // //     console.log('Face verification result:', {
+// // // //       match: isMatch,
+// // // //       storedLength: user.faceData ? user.faceData.length : 0,
+// // // //       incomingLength: faceData.length
+// // // //     });
     
-// // // //     const { fingerprintData } = req.body
-// // // //     const userId = req.user.userId
-
-// // // //     if (!fingerprintData || fingerprintData.trim() === '') {
-// // // //       return res.status(400).json({ message: 'Fingerprint data is required' })
+// // // //     if (isMatch) {
+// // // //       res.json({ 
+// // // //         success: true, 
+// // // //         message: 'Face verified successfully',
+// // // //         verified: true
+// // // //       });
+// // // //     } else {
+// // // //       res.json({ 
+// // // //         success: false, 
+// // // //         message: 'Face verification failed',
+// // // //         verified: false
+// // // //       });
 // // // //     }
-
-// // // //     const user = await User.findById(userId)
-// // // //     if (!user) return res.status(404).json({ message: 'User not found' })
-
-// // // //     user.fingerprintData = fingerprintData
-// // // //     user.fingerprintRegistered = true
-// // // //     await user.save()
-
-// // // //     res.json({ 
-// // // //       success: true, 
-// // // //       message: 'Fingerprint registered successfully' 
-// // // //     })
 // // // //   } catch (err) {
-// // // //     console.error('Register fingerprint error:', err)
-// // // //     res.status(500).json({ message: 'Server error' })
+// // // //     console.error('Verify face error:', err);
+// // // //     res.status(500).json({ 
+// // // //       success: false,
+// // // //       message: 'Server error: ' + err.message 
+// // // //     });
 // // // //   }
-// // // // })
+// // // // });
 
-// // // // export default router
-
-
+// // // // export default router;
 
 
-// // // // routes/biometricRoutes.js - ADD THIS ROUTE
+
+// // // // routes/biometricRoutes.js - COMPLETE FILE
 // // // import express from 'express'
 // // // import User from '../models/User.js'
 // // // import auth from '../middleware/auth.js'
 
 // // // const router = express.Router()
 
-// // // // ... your existing routes ...
+// // // // GET /api/biometric/status
+// // // router.get('/status', auth, async (req, res) => {
+// // //   try {
+// // //     console.log('GET /status - User ID:', req.user.userId)
+    
+// // //     const user = await User.findById(req.user.userId)
+// // //     if (!user) {
+// // //       console.log('User not found')
+// // //       return res.status(404).json({ message: 'User not found' })
+// // //     }
 
-// // // // ADD THIS NEW ENDPOINT FOR FACE VERIFICATION
+// // //     console.log('User biometric status:', {
+// // //       faceRegistered: user.faceRegistered,
+// // //       fingerprintRegistered: user.fingerprintRegistered
+// // //     })
+    
+// // //     res.json({
+// // //       faceRegistered: user.faceRegistered || false,
+// // //       fingerprintRegistered: user.fingerprintRegistered || false
+// // //     })
+// // //   } catch (err) {
+// // //     console.error('Status error:', err)
+// // //     res.status(500).json({ message: 'Server error' })
+// // //   }
+// // // })
+
+// // // // POST /api/biometric/register-face
+// // // router.post('/register-face', auth, async (req, res) => {
+// // //   try {
+// // //     console.log('POST /register-face - User ID:', req.user.userId)
+    
+// // //     const { faceData } = req.body
+    
+// // //     if (!faceData || faceData.trim() === '') {
+// // //       console.log('ERROR: faceData is empty or missing')
+// // //       return res.status(400).json({ 
+// // //         success: false,
+// // //         message: 'Face data is required' 
+// // //       })
+// // //     }
+
+// // //     console.log('Face data received, length:', faceData.length)
+    
+// // //     // Truncate if too long for demo
+// // //     const maxLength = 50000
+// // //     let faceDataToStore = faceData
+    
+// // //     if (faceData.length > maxLength) {
+// // //       console.log(`Face data too long (${faceData.length} > ${maxLength}), truncating...`)
+// // //       faceDataToStore = faceData.substring(0, maxLength)
+// // //     }
+
+// // //     const user = await User.findById(req.user.userId)
+// // //     if (!user) {
+// // //       console.log('ERROR: User not found')
+// // //       return res.status(404).json({ 
+// // //         success: false,
+// // //         message: 'User not found' 
+// // //       })
+// // //     }
+
+// // //     // Store face data
+// // //     user.faceData = faceDataToStore
+// // //     user.faceRegistered = true
+    
+// // //     await user.save()
+    
+// // //     console.log('SUCCESS: Face registered for user:', user.email, 'Length stored:', faceDataToStore.length)
+    
+// // //     res.json({ 
+// // //       success: true, 
+// // //       message: 'Face registered successfully',
+// // //       dataLength: faceDataToStore.length
+// // //     })
+// // //   } catch (err) {
+// // //     console.error('Register face error:', err.message)
+// // //     res.status(500).json({ 
+// // //       success: false,
+// // //       message: 'Server error: ' + err.message 
+// // //     })
+// // //   }
+// // // })
+
+// // // // POST /api/biometric/register-fingerprint
+// // // router.post('/register-fingerprint', auth, async (req, res) => {
+// // //   try {
+// // //     console.log('POST /register-fingerprint')
+    
+// // //     const { fingerprintData } = req.body
+    
+// // //     if (!fingerprintData || fingerprintData.trim() === '') {
+// // //       return res.status(400).json({ 
+// // //         success: false,
+// // //         message: 'Fingerprint data is required' 
+// // //       })
+// // //     }
+
+// // //     const user = await User.findById(req.user.userId)
+// // //     if (!user) return res.status(404).json({ 
+// // //       success: false,
+// // //       message: 'User not found' 
+// // //     })
+
+// // //     user.fingerprintData = fingerprintData
+// // //     user.fingerprintRegistered = true
+// // //     await user.save()
+
+// // //     res.json({ 
+// // //       success: true, 
+// // //       message: 'Fingerprint registered successfully' 
+// // //     })
+// // //   } catch (err) {
+// // //     console.error('Register fingerprint error:', err)
+// // //     res.status(500).json({ 
+// // //       success: false,
+// // //       message: 'Server error' 
+// // //     })
+// // //   }
+// // // })
+
+// // // // POST /api/biometric/verify-face
 // // // router.post('/verify-face', auth, async (req, res) => {
 // // //   try {
-// // //     console.log('POST /verify-face - User ID:', req.user.userId);
+// // //     console.log('POST /verify-face - User ID:', req.user.userId)
     
-// // //     const { faceData } = req.body;
+// // //     const { faceData } = req.body
     
 // // //     if (!faceData || faceData.trim() === '') {
 // // //       return res.status(400).json({ 
 // // //         success: false,
 // // //         message: 'Face data is required for verification' 
-// // //       });
+// // //       })
 // // //     }
 
-// // //     const user = await User.findById(req.user.userId);
+// // //     const user = await User.findById(req.user.userId)
 // // //     if (!user) {
 // // //       return res.status(404).json({ 
 // // //         success: false,
 // // //         message: 'User not found' 
-// // //       });
+// // //       })
+// // //     }
+
+// // //     // Check if face is registered
+// // //     if (!user.faceRegistered || !user.faceData) {
+// // //       return res.status(400).json({ 
+// // //         success: false,
+// // //         message: 'Face not registered. Please register face first.' 
+// // //       })
 // // //     }
 
 // // //     // SIMPLE STRING COMPARISON
-// // //     // This is for demo - in real app use facial recognition
-// // //     const isMatch = user.faceData && user.faceData === faceData;
+// // //     const isMatch = user.faceData === faceData
     
-// // //     console.log('Face verification result:', {
+// // //     console.log('Face verification check:', {
 // // //       match: isMatch,
-// // //       storedLength: user.faceData ? user.faceData.length : 0,
-// // //       incomingLength: faceData.length
-// // //     });
+// // //       storedLength: user.faceData.length,
+// // //       incomingLength: faceData.length,
+// // //       storedFirst50: user.faceData.substring(0, 50),
+// // //       incomingFirst50: faceData.substring(0, 50)
+// // //     })
     
 // // //     if (isMatch) {
 // // //       res.json({ 
 // // //         success: true, 
 // // //         message: 'Face verified successfully',
 // // //         verified: true
-// // //       });
+// // //       })
 // // //     } else {
 // // //       res.json({ 
 // // //         success: false, 
 // // //         message: 'Face verification failed',
 // // //         verified: false
-// // //       });
+// // //       })
 // // //     }
 // // //   } catch (err) {
-// // //     console.error('Verify face error:', err);
+// // //     console.error('Verify face error:', err)
 // // //     res.status(500).json({ 
 // // //       success: false,
 // // //       message: 'Server error: ' + err.message 
-// // //     });
+// // //     })
 // // //   }
-// // // });
+// // // })
 
-// // // export default router;
+// // // export default router
 
 
 
-// // // routes/biometricRoutes.js - COMPLETE FILE
+
+
+
+
+
+
+
+// // // routes/biometricRoutes.js - UPDATED FOR GEMINI
 // // import express from 'express'
 // // import User from '../models/User.js'
 // // import auth from '../middleware/auth.js'
+// // import { compareFaces } from '../services/geminiService.js' // ✅ ADD THIS IMPORT
 
 // // const router = express.Router()
 
@@ -208,15 +410,7 @@
 
 // //     console.log('Face data received, length:', faceData.length)
     
-// //     // Truncate if too long for demo
-// //     const maxLength = 50000
-// //     let faceDataToStore = faceData
-    
-// //     if (faceData.length > maxLength) {
-// //       console.log(`Face data too long (${faceData.length} > ${maxLength}), truncating...`)
-// //       faceDataToStore = faceData.substring(0, maxLength)
-// //     }
-
+// //     // ✅ DON'T TRUNCATE - Gemini needs full image
 // //     const user = await User.findById(req.user.userId)
 // //     if (!user) {
 // //       console.log('ERROR: User not found')
@@ -226,18 +420,17 @@
 // //       })
 // //     }
 
-// //     // Store face data
-// //     user.faceData = faceDataToStore
+// //     // ✅ Store FULL face data for Gemini
+// //     user.faceData = faceData
 // //     user.faceRegistered = true
     
 // //     await user.save()
     
-// //     console.log('SUCCESS: Face registered for user:', user.email, 'Length stored:', faceDataToStore.length)
+// //     console.log('✅ Face registered for user:', user.email, 'Length:', faceData.length)
     
 // //     res.json({ 
 // //       success: true, 
-// //       message: 'Face registered successfully',
-// //       dataLength: faceDataToStore.length
+// //       message: 'Face registered successfully'
 // //     })
 // //   } catch (err) {
 // //     console.error('Register face error:', err.message)
@@ -285,7 +478,7 @@
 // //   }
 // // })
 
-// // // POST /api/biometric/verify-face
+// // // POST /api/biometric/verify-face - UPDATED WITH GEMINI
 // // router.post('/verify-face', auth, async (req, res) => {
 // //   try {
 // //     console.log('POST /verify-face - User ID:', req.user.userId)
@@ -315,16 +508,12 @@
 // //       })
 // //     }
 
-// //     // SIMPLE STRING COMPARISON
-// //     const isMatch = user.faceData === faceData
+// //     console.log('🔍 Calling Gemini for face verification...')
     
-// //     console.log('Face verification check:', {
-// //       match: isMatch,
-// //       storedLength: user.faceData.length,
-// //       incomingLength: faceData.length,
-// //       storedFirst50: user.faceData.substring(0, 50),
-// //       incomingFirst50: faceData.substring(0, 50)
-// //     })
+// //     // ✅ USE GEMINI FOR FACE COMPARISON
+// //     const isMatch = await compareFaces(faceData, user.faceData)
+    
+// //     console.log('✅ Gemini verification result:', isMatch)
     
 // //     if (isMatch) {
 // //       res.json({ 
@@ -352,18 +541,21 @@
 
 
 
-
-
-
-
-
-
-
-// // routes/biometricRoutes.js - UPDATED FOR GEMINI
+// // routes/biometricRoutes.js - COMPLETE WITH GEMINI + WEBAUTHN
 // import express from 'express'
 // import User from '../models/User.js'
 // import auth from '../middleware/auth.js'
-// import { compareFaces } from '../services/geminiService.js' // ✅ ADD THIS IMPORT
+// // ⬆ at the top with other imports
+// import { isoUint8Array } from '@simplewebauthn/server/helpers'
+
+
+// import { compareFaces } from '../services/geminiService.js'
+// import { 
+//   generateAuthenticationOptions, 
+//   verifyAuthenticationResponse,
+//   generateRegistrationOptions,
+//   verifyRegistrationResponse
+// } from '@simplewebauthn/server'
 
 // const router = express.Router()
 
@@ -380,12 +572,15 @@
 
 //     console.log('User biometric status:', {
 //       faceRegistered: user.faceRegistered,
-//       fingerprintRegistered: user.fingerprintRegistered
+//       fingerprintRegistered: user.fingerprintRegistered,
+//       webAuthnDevices: user.biometricDevices?.length || 0
 //     })
     
 //     res.json({
 //       faceRegistered: user.faceRegistered || false,
-//       fingerprintRegistered: user.fingerprintRegistered || false
+//       fingerprintRegistered: user.fingerprintRegistered || false,
+//       webAuthnRegistered: (user.biometricDevices?.length || 0) > 0,
+//       deviceCount: user.biometricDevices?.length || 0
 //     })
 //   } catch (err) {
 //     console.error('Status error:', err)
@@ -393,7 +588,7 @@
 //   }
 // })
 
-// // POST /api/biometric/register-face
+// // POST /api/biometric/register-face (GEMINI)
 // router.post('/register-face', auth, async (req, res) => {
 //   try {
 //     console.log('POST /register-face - User ID:', req.user.userId)
@@ -410,7 +605,6 @@
 
 //     console.log('Face data received, length:', faceData.length)
     
-//     // ✅ DON'T TRUNCATE - Gemini needs full image
 //     const user = await User.findById(req.user.userId)
 //     if (!user) {
 //       console.log('ERROR: User not found')
@@ -420,7 +614,7 @@
 //       })
 //     }
 
-//     // ✅ Store FULL face data for Gemini
+//     // Store FULL face data for Gemini
 //     user.faceData = faceData
 //     user.faceRegistered = true
     
@@ -441,44 +635,7 @@
 //   }
 // })
 
-// // POST /api/biometric/register-fingerprint
-// router.post('/register-fingerprint', auth, async (req, res) => {
-//   try {
-//     console.log('POST /register-fingerprint')
-    
-//     const { fingerprintData } = req.body
-    
-//     if (!fingerprintData || fingerprintData.trim() === '') {
-//       return res.status(400).json({ 
-//         success: false,
-//         message: 'Fingerprint data is required' 
-//       })
-//     }
-
-//     const user = await User.findById(req.user.userId)
-//     if (!user) return res.status(404).json({ 
-//       success: false,
-//       message: 'User not found' 
-//     })
-
-//     user.fingerprintData = fingerprintData
-//     user.fingerprintRegistered = true
-//     await user.save()
-
-//     res.json({ 
-//       success: true, 
-//       message: 'Fingerprint registered successfully' 
-//     })
-//   } catch (err) {
-//     console.error('Register fingerprint error:', err)
-//     res.status(500).json({ 
-//       success: false,
-//       message: 'Server error' 
-//     })
-//   }
-// })
-
-// // POST /api/biometric/verify-face - UPDATED WITH GEMINI
+// // POST /api/biometric/verify-face (GEMINI)
 // router.post('/verify-face', auth, async (req, res) => {
 //   try {
 //     console.log('POST /verify-face - User ID:', req.user.userId)
@@ -500,7 +657,6 @@
 //       })
 //     }
 
-//     // Check if face is registered
 //     if (!user.faceRegistered || !user.faceData) {
 //       return res.status(400).json({ 
 //         success: false,
@@ -510,7 +666,6 @@
 
 //     console.log('🔍 Calling Gemini for face verification...')
     
-//     // ✅ USE GEMINI FOR FACE COMPARISON
 //     const isMatch = await compareFaces(faceData, user.faceData)
     
 //     console.log('✅ Gemini verification result:', isMatch)
@@ -537,7 +692,281 @@
 //   }
 // })
 
+// // ✅ NEW: GET fingerprint registration options (WebAuthn)
+// router.get('/fingerprint-register-options', auth, async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user.userId)
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' })
+//     }
+
+//     const rpName = 'SecureATM'
+//     const rpID = process.env.RP_ID || 'localhost'
+
+//     // 🔥 FIX: userID must be Uint8Array, not string
+//     const userID = isoUint8Array.fromUTF8String(user._id.toString())
+
+//     const options = await generateRegistrationOptions({
+//       rpName,
+//       rpID,
+//       userID,                 // now correct type
+//       userName: user.email,
+//       timeout: 60000,
+//       attestationType: 'none',
+//       authenticatorSelection: {
+//         authenticatorAttachment: 'platform',
+//         userVerification: 'required',
+//         residentKey: 'preferred'
+//       },
+//       excludeCredentials: user.biometricDevices?.map(dev => ({
+//         id: dev.credentialID,
+//         type: 'public-key',
+//         transports: dev.transports
+//       })) || [],
+//       supportedAlgorithmIDs: [-7, -257],
+//     })
+
+//     req.session.currentChallenge = options.challenge
+
+//     console.log('✅ Registration options generated for:', user.email)
+//     res.json(options)
+//   } catch (error) {
+//     console.error('Error generating registration options:', error)
+//     res.status(500).json({ message: 'Failed to generate registration options' })
+//   }
+// })
+
+// // ✅ NEW: POST verify fingerprint registration (WebAuthn)
+// router.post('/fingerprint-register-verify', auth, async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user.userId)
+//     if (!user) {
+//       return res.status(404).json({ success: false, message: 'User not found' })
+//     }
+
+//     const { registrationResult, deviceName } = req.body
+//     const expectedChallenge = req.session.currentChallenge
+
+//     if (!expectedChallenge) {
+//       return res.status(400).json({ 
+//         success: false, 
+//         message: 'No challenge found. Please try again.' 
+//       })
+//     }
+
+//     const rpID = process.env.RP_ID || 'localhost'
+//     const expectedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173'
+
+//     const verification = await verifyRegistrationResponse({
+//       response: registrationResult,
+//       expectedChallenge,
+//       expectedOrigin,
+//       expectedRPID: rpID,
+//       requireUserVerification: true
+//     })
+
+//     if (verification.verified && verification.registrationInfo) {
+//       const { credentialPublicKey, credentialID, counter } = verification.registrationInfo
+
+//       // Add new device to user's biometric devices
+//       if (!user.biometricDevices) {
+//         user.biometricDevices = []
+//       }
+
+//       user.biometricDevices.push({
+//         credentialID: Buffer.from(credentialID),
+//         credentialPublicKey: Buffer.from(credentialPublicKey),
+//         counter,
+//         transports: registrationResult.response.transports || [],
+//         deviceName: deviceName || 'Biometric Device',
+//         registeredAt: new Date()
+//       })
+
+//       user.fingerprintRegistered = true
+//       await user.save()
+
+//       // Clear challenge
+//       delete req.session.currentChallenge
+
+//       console.log('✅ Biometric device registered for:', user.email)
+//       res.json({ 
+//         success: true, 
+//         message: 'Biometric device registered successfully' 
+//       })
+//     } else {
+//       res.status(400).json({ 
+//         success: false, 
+//         message: 'Registration verification failed' 
+//       })
+//     }
+//   } catch (error) {
+//     console.error('Registration verification error:', error)
+//     res.status(500).json({ 
+//       success: false, 
+//       message: 'Registration failed: ' + error.message 
+//     })
+//   }
+// })
+
+// // ✅ NEW: GET fingerprint authentication options (WebAuthn)
+// router.get('/fingerprint-options', auth, async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user.userId)
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' })
+//     }
+
+//     if (!user.biometricDevices || user.biometricDevices.length === 0) {
+//       return res.status(400).json({ 
+//         message: 'No biometric device registered. Please register in Settings first.' 
+//       })
+//     }
+
+//     const rpID = process.env.RP_ID || 'localhost'
+
+//     const options = await generateAuthenticationOptions({
+//       timeout: 60000,
+//       allowCredentials: user.biometricDevices.map(dev => ({
+//         id: dev.credentialID,
+//         type: 'public-key',
+//         transports: dev.transports || []
+//       })),
+//       userVerification: 'required',
+//       rpID
+//     })
+
+//     // Store challenge in session
+//     req.session.currentChallenge = options.challenge
+    
+//     console.log('✅ Authentication options generated for:', user.email)
+//     res.json(options)
+//   } catch (error) {
+//     console.error('Error generating authentication options:', error)
+//     res.status(500).json({ message: 'Failed to generate authentication options' })
+//   }
+// })
+
+// // ✅ NEW: POST verify fingerprint authentication (WebAuthn)
+// router.post('/verify-fingerprint', auth, async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user.userId)
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' })
+//     }
+
+//     const { authResult } = req.body
+//     const expectedChallenge = req.session.currentChallenge
+
+//     if (!expectedChallenge) {
+//       return res.status(400).json({ 
+//         verified: false,
+//         message: 'No challenge found. Please try again.' 
+//       })
+//     }
+
+//     // Find the authenticator device
+//     const authenticator = user.biometricDevices?.find(dev => 
+//       dev.credentialID.toString('base64url') === authResult.id
+//     )
+
+//     if (!authenticator) {
+//       return res.status(400).json({ 
+//         verified: false, 
+//         message: 'Device not registered' 
+//       })
+//     }
+
+//     const rpID = process.env.RP_ID || 'localhost'
+//     const expectedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173'
+
+//     // Verify the authentication response
+//     const verification = await verifyAuthenticationResponse({
+//       response: authResult,
+//       expectedChallenge,
+//       expectedOrigin,
+//       expectedRPID: rpID,
+//       authenticator: {
+//         credentialID: authenticator.credentialID,
+//         credentialPublicKey: authenticator.credentialPublicKey,
+//         counter: authenticator.counter
+//       },
+//       requireUserVerification: true
+//     })
+
+//     // Update counter if verification succeeded
+//     if (verification.verified) {
+//       authenticator.counter = verification.authenticationInfo.newCounter
+//       await user.save()
+//     }
+
+//     // Clear the challenge
+//     delete req.session.currentChallenge
+
+//     console.log('✅ Fingerprint verification result:', verification.verified, 'for:', user.email)
+
+//     res.json({ 
+//       verified: verification.verified,
+//       message: verification.verified ? 'Fingerprint verified successfully' : 'Verification failed'
+//     })
+//   } catch (error) {
+//     console.error('Fingerprint verification error:', error)
+//     res.status(500).json({ 
+//       verified: false, 
+//       message: 'Verification failed: ' + error.message 
+//     })
+//   }
+// })
+
+// // OLD: Legacy dummy fingerprint (keep for backward compatibility)
+// router.post('/register-fingerprint', auth, async (req, res) => {
+//   try {
+//     console.log('POST /register-fingerprint (legacy)')
+    
+//     const { fingerprintData } = req.body
+    
+//     if (!fingerprintData || fingerprintData.trim() === '') {
+//       return res.status(400).json({ 
+//         success: false,
+//         message: 'Fingerprint data is required' 
+//       })
+//     }
+
+//     const user = await User.findById(req.user.userId)
+//     if (!user) {
+//       return res.status(404).json({ 
+//         success: false,
+//         message: 'User not found' 
+//       })
+//     }
+
+//     user.fingerprintData = fingerprintData
+//     user.fingerprintRegistered = true
+//     await user.save()
+
+//     res.json({ 
+//       success: true, 
+//       message: 'Fingerprint registered successfully' 
+//     })
+//   } catch (err) {
+//     console.error('Register fingerprint error:', err)
+//     res.status(500).json({ 
+//       success: false,
+//       message: 'Server error' 
+//     })
+//   }
+// })
+
 // export default router
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -545,16 +974,14 @@
 import express from 'express'
 import User from '../models/User.js'
 import auth from '../middleware/auth.js'
-// ⬆ at the top with other imports
-import { isoUint8Array } from '@simplewebauthn/server/helpers'
-
+import { isoUint8Array, isoBase64URL } from '@simplewebauthn/server/helpers'
 
 import { compareFaces } from '../services/geminiService.js'
-import { 
-  generateAuthenticationOptions, 
+import {
+  generateAuthenticationOptions,
   verifyAuthenticationResponse,
   generateRegistrationOptions,
-  verifyRegistrationResponse
+  verifyRegistrationResponse,
 } from '@simplewebauthn/server'
 
 const router = express.Router()
@@ -563,7 +990,7 @@ const router = express.Router()
 router.get('/status', auth, async (req, res) => {
   try {
     console.log('GET /status - User ID:', req.user.userId)
-    
+
     const user = await User.findById(req.user.userId)
     if (!user) {
       console.log('User not found')
@@ -573,14 +1000,14 @@ router.get('/status', auth, async (req, res) => {
     console.log('User biometric status:', {
       faceRegistered: user.faceRegistered,
       fingerprintRegistered: user.fingerprintRegistered,
-      webAuthnDevices: user.biometricDevices?.length || 0
+      webAuthnDevices: user.biometricDevices?.length || 0,
     })
-    
+
     res.json({
       faceRegistered: user.faceRegistered || false,
       fingerprintRegistered: user.fingerprintRegistered || false,
       webAuthnRegistered: (user.biometricDevices?.length || 0) > 0,
-      deviceCount: user.biometricDevices?.length || 0
+      deviceCount: user.biometricDevices?.length || 0,
     })
   } catch (err) {
     console.error('Status error:', err)
@@ -592,45 +1019,45 @@ router.get('/status', auth, async (req, res) => {
 router.post('/register-face', auth, async (req, res) => {
   try {
     console.log('POST /register-face - User ID:', req.user.userId)
-    
+
     const { faceData } = req.body
-    
+
     if (!faceData || faceData.trim() === '') {
       console.log('ERROR: faceData is empty or missing')
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Face data is required' 
+        message: 'Face data is required',
       })
     }
 
     console.log('Face data received, length:', faceData.length)
-    
+
     const user = await User.findById(req.user.userId)
     if (!user) {
       console.log('ERROR: User not found')
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'User not found' 
+        message: 'User not found',
       })
     }
 
     // Store FULL face data for Gemini
     user.faceData = faceData
     user.faceRegistered = true
-    
+
     await user.save()
-    
+
     console.log('✅ Face registered for user:', user.email, 'Length:', faceData.length)
-    
-    res.json({ 
-      success: true, 
-      message: 'Face registered successfully'
+
+    res.json({
+      success: true,
+      message: 'Face registered successfully',
     })
   } catch (err) {
     console.error('Register face error:', err.message)
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Server error: ' + err.message 
+      message: 'Server error: ' + err.message,
     })
   }
 })
@@ -639,60 +1066,60 @@ router.post('/register-face', auth, async (req, res) => {
 router.post('/verify-face', auth, async (req, res) => {
   try {
     console.log('POST /verify-face - User ID:', req.user.userId)
-    
+
     const { faceData } = req.body
-    
+
     if (!faceData || faceData.trim() === '') {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Face data is required for verification' 
+        message: 'Face data is required for verification',
       })
     }
 
     const user = await User.findById(req.user.userId)
     if (!user) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'User not found' 
+        message: 'User not found',
       })
     }
 
     if (!user.faceRegistered || !user.faceData) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Face not registered. Please register face first.' 
+        message: 'Face not registered. Please register face first.',
       })
     }
 
     console.log('🔍 Calling Gemini for face verification...')
-    
+
     const isMatch = await compareFaces(faceData, user.faceData)
-    
+
     console.log('✅ Gemini verification result:', isMatch)
-    
+
     if (isMatch) {
-      res.json({ 
-        success: true, 
+      res.json({
+        success: true,
         message: 'Face verified successfully',
-        verified: true
+        verified: true,
       })
     } else {
-      res.json({ 
-        success: false, 
+      res.json({
+        success: false,
         message: 'Face verification failed',
-        verified: false
+        verified: false,
       })
     }
   } catch (err) {
     console.error('Verify face error:', err)
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Server error: ' + err.message 
+      message: 'Server error: ' + err.message,
     })
   }
 })
 
-// ✅ NEW: GET fingerprint registration options (WebAuthn)
+// ✅ GET fingerprint registration options (WebAuthn)
 router.get('/fingerprint-register-options', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId)
@@ -703,30 +1130,33 @@ router.get('/fingerprint-register-options', auth, async (req, res) => {
     const rpName = 'SecureATM'
     const rpID = process.env.RP_ID || 'localhost'
 
-    // 🔥 FIX: userID must be Uint8Array, not string
+    // userID must be Uint8Array, not string
     const userID = isoUint8Array.fromUTF8String(user._id.toString())
 
     const options = await generateRegistrationOptions({
       rpName,
       rpID,
-      userID,                 // now correct type
+      userID,
       userName: user.email,
       timeout: 60000,
       attestationType: 'none',
       authenticatorSelection: {
         authenticatorAttachment: 'platform',
         userVerification: 'required',
-        residentKey: 'preferred'
+        residentKey: 'preferred',
       },
-      excludeCredentials: user.biometricDevices?.map(dev => ({
-        id: dev.credentialID,
-        type: 'public-key',
-        transports: dev.transports
-      })) || [],
+      excludeCredentials:
+        user.biometricDevices?.map((dev) => ({
+          id: dev.credentialID,
+          type: 'public-key',
+          transports: dev.transports,
+        })) || [],
       supportedAlgorithmIDs: [-7, -257],
     })
 
-    req.session.currentChallenge = options.challenge
+    // Save challenge on user instead of session
+    user.webauthnChallenge = options.challenge
+    await user.save()
 
     console.log('✅ Registration options generated for:', user.email)
     res.json(options)
@@ -736,7 +1166,7 @@ router.get('/fingerprint-register-options', auth, async (req, res) => {
   }
 })
 
-// ✅ NEW: POST verify fingerprint registration (WebAuthn)
+// ✅ POST verify fingerprint registration (WebAuthn)
 router.post('/fingerprint-register-verify', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId)
@@ -745,12 +1175,12 @@ router.post('/fingerprint-register-verify', auth, async (req, res) => {
     }
 
     const { registrationResult, deviceName } = req.body
-    const expectedChallenge = req.session.currentChallenge
+    const expectedChallenge = user.webauthnChallenge
 
     if (!expectedChallenge) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'No challenge found. Please try again.' 
+      return res.status(400).json({
+        success: false,
+        message: 'No challenge found. Please try again.',
       })
     }
 
@@ -762,7 +1192,7 @@ router.post('/fingerprint-register-verify', auth, async (req, res) => {
       expectedChallenge,
       expectedOrigin,
       expectedRPID: rpID,
-      requireUserVerification: true
+      requireUserVerification: true,
     })
 
     if (verification.verified && verification.registrationInfo) {
@@ -779,36 +1209,50 @@ router.post('/fingerprint-register-verify', auth, async (req, res) => {
         counter,
         transports: registrationResult.response.transports || [],
         deviceName: deviceName || 'Biometric Device',
-        registeredAt: new Date()
+        registeredAt: new Date(),
       })
 
       user.fingerprintRegistered = true
+      user.webauthnChallenge = null
       await user.save()
 
-      // Clear challenge
-      delete req.session.currentChallenge
-
       console.log('✅ Biometric device registered for:', user.email)
-      res.json({ 
-        success: true, 
-        message: 'Biometric device registered successfully' 
+      res.json({
+        success: true,
+        message: 'Biometric device registered successfully',
       })
     } else {
-      res.status(400).json({ 
-        success: false, 
-        message: 'Registration verification failed' 
+      // Clear challenge on failure too
+      user.webauthnChallenge = null
+      await user.save()
+
+      res.status(400).json({
+        success: false,
+        message: 'Registration verification failed',
       })
     }
   } catch (error) {
     console.error('Registration verification error:', error)
-    res.status(500).json({ 
-      success: false, 
-      message: 'Registration failed: ' + error.message 
+
+    // Try to clear challenge on error as well
+    try {
+      const user = await User.findById(req.user.userId)
+      if (user) {
+        user.webauthnChallenge = null
+        await user.save()
+      }
+    } catch (e) {
+      console.error('Error clearing challenge after registration error:', e)
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Registration failed: ' + error.message,
     })
   }
 })
 
-// ✅ NEW: GET fingerprint authentication options (WebAuthn)
+// ✅ GET fingerprint authentication options (WebAuthn)
 router.get('/fingerprint-options', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId)
@@ -817,8 +1261,8 @@ router.get('/fingerprint-options', auth, async (req, res) => {
     }
 
     if (!user.biometricDevices || user.biometricDevices.length === 0) {
-      return res.status(400).json({ 
-        message: 'No biometric device registered. Please register in Settings first.' 
+      return res.status(400).json({
+        message: 'No biometric device registered. Please register in Settings first.',
       })
     }
 
@@ -826,18 +1270,18 @@ router.get('/fingerprint-options', auth, async (req, res) => {
 
     const options = await generateAuthenticationOptions({
       timeout: 60000,
-      allowCredentials: user.biometricDevices.map(dev => ({
+      allowCredentials: user.biometricDevices.map((dev) => ({
         id: dev.credentialID,
         type: 'public-key',
-        transports: dev.transports || []
+        transports: dev.transports || [],
       })),
       userVerification: 'required',
-      rpID
+      rpID,
     })
 
-    // Store challenge in session
-    req.session.currentChallenge = options.challenge
-    
+    user.webauthnChallenge = options.challenge
+    await user.save()
+
     console.log('✅ Authentication options generated for:', user.email)
     res.json(options)
   } catch (error) {
@@ -846,7 +1290,7 @@ router.get('/fingerprint-options', auth, async (req, res) => {
   }
 })
 
-// ✅ NEW: POST verify fingerprint authentication (WebAuthn)
+// ✅ POST verify fingerprint authentication (WebAuthn)
 router.post('/verify-fingerprint', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId)
@@ -855,24 +1299,26 @@ router.post('/verify-fingerprint', auth, async (req, res) => {
     }
 
     const { authResult } = req.body
-    const expectedChallenge = req.session.currentChallenge
+    const expectedChallenge = user.webauthnChallenge
 
     if (!expectedChallenge) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         verified: false,
-        message: 'No challenge found. Please try again.' 
+        message: 'No challenge found. Please try again.',
       })
     }
 
-    // Find the authenticator device
-    const authenticator = user.biometricDevices?.find(dev => 
-      dev.credentialID.toString('base64url') === authResult.id
+    // Find the authenticator device by comparing stored credentialID with authResult.rawId
+    const authenticator = user.biometricDevices?.find(
+      (dev) => isoBase64URL.fromBuffer(dev.credentialID) === authResult.rawId
     )
 
     if (!authenticator) {
-      return res.status(400).json({ 
-        verified: false, 
-        message: 'Device not registered' 
+      user.webauthnChallenge = null
+      await user.save()
+      return res.status(400).json({
+        verified: false,
+        message: 'Device not registered',
       })
     }
 
@@ -888,31 +1334,49 @@ router.post('/verify-fingerprint', auth, async (req, res) => {
       authenticator: {
         credentialID: authenticator.credentialID,
         credentialPublicKey: authenticator.credentialPublicKey,
-        counter: authenticator.counter
+        counter: authenticator.counter,
       },
-      requireUserVerification: true
+      requireUserVerification: true,
     })
 
-    // Update counter if verification succeeded
     if (verification.verified) {
       authenticator.counter = verification.authenticationInfo.newCounter
+      user.webauthnChallenge = null
+      await user.save()
+    } else {
+      user.webauthnChallenge = null
       await user.save()
     }
 
-    // Clear the challenge
-    delete req.session.currentChallenge
+    console.log(
+      '✅ Fingerprint verification result:',
+      verification.verified,
+      'for:',
+      user.email
+    )
 
-    console.log('✅ Fingerprint verification result:', verification.verified, 'for:', user.email)
-
-    res.json({ 
+    res.json({
       verified: verification.verified,
-      message: verification.verified ? 'Fingerprint verified successfully' : 'Verification failed'
+      message: verification.verified
+        ? 'Fingerprint verified successfully'
+        : 'Verification failed',
     })
   } catch (error) {
     console.error('Fingerprint verification error:', error)
-    res.status(500).json({ 
-      verified: false, 
-      message: 'Verification failed: ' + error.message 
+
+    try {
+      const user = await User.findById(req.user.userId)
+      if (user) {
+        user.webauthnChallenge = null
+        await user.save()
+      }
+    } catch (e) {
+      console.error('Error clearing challenge after auth error:', e)
+    }
+
+    res.status(500).json({
+      verified: false,
+      message: 'Verification failed: ' + error.message,
     })
   }
 })
@@ -921,21 +1385,21 @@ router.post('/verify-fingerprint', auth, async (req, res) => {
 router.post('/register-fingerprint', auth, async (req, res) => {
   try {
     console.log('POST /register-fingerprint (legacy)')
-    
+
     const { fingerprintData } = req.body
-    
+
     if (!fingerprintData || fingerprintData.trim() === '') {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Fingerprint data is required' 
+        message: 'Fingerprint data is required',
       })
     }
 
     const user = await User.findById(req.user.userId)
     if (!user) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'User not found' 
+        message: 'User not found',
       })
     }
 
@@ -943,15 +1407,15 @@ router.post('/register-fingerprint', auth, async (req, res) => {
     user.fingerprintRegistered = true
     await user.save()
 
-    res.json({ 
-      success: true, 
-      message: 'Fingerprint registered successfully' 
+    res.json({
+      success: true,
+      message: 'Fingerprint registered successfully',
     })
   } catch (err) {
     console.error('Register fingerprint error:', err)
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Server error' 
+      message: 'Server error',
     })
   }
 })
