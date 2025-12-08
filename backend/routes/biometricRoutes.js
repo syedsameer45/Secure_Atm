@@ -1125,8 +1125,6 @@ router.get('/fingerprint-register-options', auth, async (req, res) => {
 
     const rpName = 'SecureATM'
     const rpID = process.env.RP_ID || 'localhost'
-
-    // userID must be Uint8Array, not string
     const userID = isoUint8Array.fromUTF8String(user._id.toString())
 
     const options = await generateRegistrationOptions({
@@ -1143,14 +1141,14 @@ router.get('/fingerprint-register-options', auth, async (req, res) => {
       },
       excludeCredentials:
         user.biometricDevices?.map((dev) => ({
-          id: dev.credentialID,
+          // 🔥 IMPORTANT: convert Buffer → base64url string
+          id: isoBase64URL.fromBuffer(dev.credentialID),
           type: 'public-key',
-          transports: dev.transports,
+          transports: dev.transports || [],
         })) || [],
       supportedAlgorithmIDs: [-7, -257],
     })
 
-    // Save challenge on user instead of session
     user.webauthnChallenge = options.challenge
     await user.save()
 
